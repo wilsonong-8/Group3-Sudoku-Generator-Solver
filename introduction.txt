@@ -1,0 +1,15 @@
+================================================================================================
+Welcome to Group 3's Sudoku Generator and Independent Solver Program.
+
+This program aims to generate a set of Sudoku Puzzle to be solved by our Program Solver.
+You choose the number of blanks from a range of 1 - 55 for the amount of blanks in the puzzle.
+The solver will solve the puzzle and  generate various metrics to be stored into a CSV file.
+After the Solver gives a difficulty rating, you can choose an Easier or Harder puzzle to be generated.
+The Solver will then feed the data into the Generator to produce a different set of Puzzle based on your choice.
+
+The Difficulty Recommendations are as follows:
+EASY: 1 - 300
+MEDIUM: 300 - 1500
+HARD: 1500 - 3000
+VERY HARD: >3000
+================================================================================================
