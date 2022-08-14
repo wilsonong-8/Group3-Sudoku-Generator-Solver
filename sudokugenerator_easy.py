@@ -1,5 +1,7 @@
 import sudokugenerator_hard
+import sudokugenerator_custom
 import pickle
+import time
 
 num_of_backtrack_1 = 0
 
@@ -67,111 +69,139 @@ def generateBoard_easy():
 
     global num_of_backtrack_1
 
+    timeout = time.time() + 8
+    print("Generating..\n")
+
     while True:
-        infile = open('empties.txt', 'rb')
-        empties = int(pickle.load(infile))
-        infile.close
+        if time.time() < timeout:
+            infile = open('empties.txt', 'rb')
+            empties = int(pickle.load(infile))
+            infile.close
 
-        def pattern(r,c): return (3*(r%3)+r//3+c)%9
+            def pattern(r,c): return (3*(r%3)+r//3+c)%9
 
-        from random import sample
-        def shuffle(s): return sample(s,len(s))
-        rBase = range(3)
-        rows  = [ g*3 + r for g in shuffle(rBase) for r in shuffle(rBase) ]
-        cols  = [ g*3 + c for g in shuffle(rBase) for c in shuffle(rBase) ]
-        nums  = shuffle(range(1,3*3+1))
+            from random import sample
+            def shuffle(s): return sample(s,len(s))
+            rBase = range(3)
+            rows  = [ g*3 + r for g in shuffle(rBase) for r in shuffle(rBase) ]
+            cols  = [ g*3 + c for g in shuffle(rBase) for c in shuffle(rBase) ]
+            nums  = shuffle(range(1,3*3+1))
 
-        board = [ [nums[pattern(r,c)] for c in cols] for r in rows ]
+            board = [ [nums[pattern(r,c)] for c in cols] for r in rows ]
 
-        with open('puzzle.txt', 'w') as f:
-            for line in board: f.write(f"{line}\n")
+            with open('puzzle.txt', 'w') as f:
+                for line in board: f.write(f"{line}\n")
 
-        new_board = []
-        squares = 9*9
-        empties = empties
-        for p in sample(range(squares),empties):
-            board[p // 9][p % 9] = 0
+            new_board = []
+            squares = 9*9
+            empties = empties
+            for p in sample(range(squares),empties):
+                board[p // 9][p % 9] = 0
 
-        numSize = len(str(9))
-        for line in board:
-            # print(*(f"{n or '.':{numSize}} " for n in line))
-            for i in line:
-                new_board.append(i)
+            numSize = len(str(9))
+            for line in board:
+                # print(*(f"{n or '.':{numSize}} " for n in line))
+                for i in line:
+                    new_board.append(i)
 
-        for i in range(len(new_board)):
-            if new_board[i] == 0:
-                new_board[i] = -1
+            for i in range(len(new_board)):
+                if new_board[i] == 0:
+                    new_board[i] = -1
 
-        def divide_chunks_1(l, n):
-            # looping till length l
-            for i in range(0, len(l), n):
-                yield l[i:i + n]
+            def divide_chunks_1(l, n):
+                # looping till length l
+                for i in range(0, len(l), n):
+                    yield l[i:i + n]
 
-        x = list(divide_chunks_1(new_board, 9))
+            x = list(divide_chunks_1(new_board, 9))
 
-        solve_puzzle_1(x)
+            solve_puzzle_1(x)
 
-        infile_1 = open('backtrack_num.txt', 'rb')
-        backtrack_stat = int(pickle.load(infile_1))
-        infile_1.close
-        # print(f"Original difficulty: {backtrack_stat}")
-        backtrack_stat_final = int(backtrack_stat/1.3)
+            infile_1 = open('backtrack_num.txt', 'rb')
+            backtrack_stat = int(pickle.load(infile_1))
+            infile_1.close
+            # print(f"Original difficulty: {backtrack_stat}")
+            backtrack_stat_final = int(backtrack_stat*0.80)
 
-        # print(f"Run = {num_of_backtrack_1}")
-        if num_of_backtrack_1 > backtrack_stat_final:                   #I WANT EASIER FUNCTION
-            num_of_backtrack_1 = 0
-            continue
+            # print(f"Run = {num_of_backtrack_1}")
+            if num_of_backtrack_1 > backtrack_stat_final or num_of_backtrack_1 < int(backtrack_stat*0.75):                   #I WANT EASIER FUNCTION
+                num_of_backtrack_1 = 0
+                continue
+            else:
+                print("Sudoku Board with Answers:")
+                print("----------------------------")
+                with open('puzzle.txt') as f:
+                    new_puzzle = f.read()
+                    print(new_puzzle)
+                print("----------------------------")
+
+                print(f"Sudoku Board with {empties} Blanks:")
+                print("---------------------------")
+                numSize = len(str(9))
+                for line in board:
+                    print(*(f"{n or '.':{numSize}} " for n in line))
+                    for i in line:
+                        new_board.append(i)
+
+                    for i in range(len(new_board)):
+                        if new_board[i] == 0:
+                            new_board[i] = -1
+
+                    def divide_chunks_1(l, n):
+                        # looping till length l
+                        for i in range(0, len(l), n):
+                            yield l[i:i + n]
+
+                    x = list(divide_chunks_1(new_board, 9))
+
+                print("---------------------------\n")
+                print("=====================================================================")
+                print("GENERATING AN EASIER PUZZLE")
+                print(f"Number of Blanks: {empties}")
+                print(f"Original Difficulty: {backtrack_stat}")
+                print(f"New Difficulty: {num_of_backtrack_1}")
+                if num_of_backtrack_1 > 4001:
+                    print(
+                        f"The Difficulty Level of {num_of_backtrack_1} is very High. Suggest decreasing the difficulty. ")
+                elif num_of_backtrack_1 > 2001:
+                    print(
+                        f"The Difficulty Level of {num_of_backtrack_1} is slightly High. Suggest decreasing the difficulty. ")
+                elif num_of_backtrack_1 > 301:
+                    print(
+                        f"The Difficulty Level of {num_of_backtrack_1} is slightly Low. Suggest increasing the difficulty. ")
+                else:
+                    print(
+                        f"The Difficulty Level of {num_of_backtrack_1} is very Low. Suggest increasing the difficulty. ")
+                print("=====================================================================\n")
+
+                outfile_1 = open('backtrack_num.txt', 'wb')
+                pickle.dump(int(num_of_backtrack_1), outfile_1)
+                outfile_1.close()
+                break
         else:
+            print("===================================================================================================")
+            print("Puzzle could not be found at an easier difficulty setting. Suggest choosing another difficulty setting.")
+            print("===================================================================================================\n")
             break
 
-
-    print("Sudoku Board with Answers:")
-    print("----------------------------")
-    with open('puzzle.txt') as f:
-        new_puzzle = f.read()
-        print(new_puzzle)
-    print("----------------------------")
-
-    print(f"Sudoku Board with {empties} Blanks:")
-    print("---------------------------")
-    numSize = len(str(9))
-    for line in board:
-        print(*(f"{n or '.':{numSize}} " for n in line))
-        for i in line:
-            new_board.append(i)
-
-        for i in range(len(new_board)):
-            if new_board[i] == 0:
-                new_board[i] = -1
-
-        def divide_chunks_1(l, n):
-            # looping till length l
-            for i in range(0, len(l), n):
-                yield l[i:i + n]
-
-        x = list(divide_chunks_1(new_board, 9))
-
-    print("---------------------------\n")
-    print("=====================================================================")
-    print("GENERATING AN EASIER PUZZLE")
-    print(f"Number of Blanks: {empties}")
-    print(f"Original difficulty: {backtrack_stat}")
-    print(f"New Difficulty: {num_of_backtrack_1}")
-    print("=====================================================================\n")
-
-    outfile_1 = open('backtrack_num.txt', 'wb')
-    pickle.dump(int(num_of_backtrack_1), outfile_1)
-    outfile_1.close()
-
-
-    answer3 = str(input('Enter (a)Easier / (b)Harder to Generate a different set of Puzzle or any key to Pass: \n'))
+    while True:
+        answer3 = str(input('Choose your next step(a, b, c, d):\n---------------------------\n'
+                            '(a)Easier set of Puzzle\n(b)Harder set of Puzzle\n(c)Choose a Custom Difficulty'
+                            '\n(d)Pass\nEnter your choice: '))
+        if answer3 in ('a', 'b', 'c', 'd'):
+            break
+        print("invalid input.\n")
     if answer3 == 'a':
         print("===================================================================")
         generateBoard_easy()
     elif answer3 == 'b':
         print("===================================================================")
         sudokugenerator_hard.generateBoard_hard()
-    else:
+    elif answer3 == 'c':
+        print("===================================================================")
+        sudokugenerator_custom.generateBoard_custom()
+    elif answer3 == 'd':
         return x
+
 
 

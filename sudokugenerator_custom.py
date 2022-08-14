@@ -1,11 +1,12 @@
 import sudokugenerator_easy
-import sudokugenerator_custom
+import sudokugenerator_hard
 import pickle
 import time
 
 num_of_backtrack_1 = 0
 
-def generateBoard_hard():
+
+def generateBoard_custom():
 
     def find_next_blank_1(blank):
         # finds the next row, col on the puzzle that's not filled
@@ -58,7 +59,6 @@ def generateBoard_hard():
 
                 # step 4: recursively calls the solver
                 if solve_puzzle_1(blank):
-                    # empty_squares += 1
                     return True
 
             # step 5: if not valid or not True, then backtrack and try a new number
@@ -69,8 +69,22 @@ def generateBoard_hard():
 
     global num_of_backtrack_1
 
+    infile_1 = open('backtrack_num.txt', 'rb')
+    backtrack_stat = int(pickle.load(infile_1))
+    infile_1.close
+
+    while True:
+        try:
+            backtrack_custom = int(input(f"Choose your difficulty level (Original Difficulty:{backtrack_stat}): "))
+
+        except ValueError:
+            print("Invalid input")
+            continue
+        else:
+            break
+    print("Generating..")
+
     timeout = time.time() + 8
-    print("Generating..\n")
 
     while True:
         if time.time() < timeout:
@@ -120,15 +134,14 @@ def generateBoard_hard():
             infile_1 = open('backtrack_num.txt', 'rb')
             backtrack_stat = int(pickle.load(infile_1))
             infile_1.close
-
-            # print(f"Original difficulty: {backtrack_stat}")
-            backtrack_stat_final = int(backtrack_stat*1.2)
-
+            # print(f"Original difficulty: {backtrack_custom}")
             # print(f"Run = {num_of_backtrack_1}")
-            if num_of_backtrack_1 < backtrack_stat_final or num_of_backtrack_1 > int(backtrack_stat*1.25):                   #I WANT MORE DIFFICULT FUNCTION
+            if num_of_backtrack_1 > int(backtrack_custom * 1.2) or num_of_backtrack_1 < int(backtrack_custom*0.8):
+                # if num_of_backtrack_1 < backtrack_custom / 2:                   #I WANT CUSTOM TO BE 40% APART
                 num_of_backtrack_1 = 0
                 continue
             else:
+                print()
                 print("Sudoku Board with Answers:")
                 print("----------------------------")
                 with open('puzzle.txt') as f:
@@ -157,7 +170,7 @@ def generateBoard_hard():
 
                 print("---------------------------\n")
                 print("=====================================================================")
-                print("GENERATING A HARDER PUZZLE")
+                print("GENERATING AN EASIER PUZZLE")
                 print(f"Number of Blanks: {empties}")
                 print(f"Original Difficulty: {backtrack_stat}")
                 print(f"New Difficulty: {num_of_backtrack_1}")
@@ -180,10 +193,11 @@ def generateBoard_hard():
                 outfile_1.close()
                 break
         else:
-            print("===================================================================================================")
-            print("Puzzle could not be found at a harder difficulty setting. Suggest choosing another difficulty setting.")
+            print("\n=================================================================================================")
+            print("Puzzle could not be found for this difficulty setting. Suggest choosing another difficulty setting.")
             print("===================================================================================================\n")
             break
+
 
     while True:
         answer3 = str(input('Choose your next step(a, b, c, d):\n---------------------------\n'
@@ -197,9 +211,11 @@ def generateBoard_hard():
         sudokugenerator_easy.generateBoard_easy()
     elif answer3 == 'b':
         print("===================================================================")
-        generateBoard_hard()
+        sudokugenerator_hard.generateBoard_hard()
     elif answer3 == 'c':
         print("===================================================================")
-        sudokugenerator_custom.generateBoard_custom()
+        generateBoard_custom()
     elif answer3 == 'd':
         return x
+
+

@@ -6,15 +6,16 @@ def generateBoard():
     empties = 0
     while True:
         try:
-            empties = int(input("Firstly, choose the number of blanks from 1 - 55: "))
+            print("Difficulty Level for Number of Blanks:\nVery Easy: 1 - 34\nEasy: 35 - 45\nMedium: 46 - 49\nDifficult: 50 - 53\nEvil: 54 - 58")
+            empties = int(input("Firstly, choose the number of blanks from 1 - 58: "))
 
         except ValueError:
-            print("Invalid input")
+            print("Invalid input\n")
             continue
-        if empties in range(1, 56):
+        if empties in range(1, 59):
             break
-        print("Invalid input")
-    if empties == range(1,56):
+        print("Invalid input\n")
+    if empties == range(1,59):
         return empties
 
     def pattern(r,c): return (base*(r%base)+r//base+c)%side
